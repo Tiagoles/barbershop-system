@@ -9,6 +9,8 @@ import { ServicesHistoryComponent } from './services-history/services-history.co
 import { TeamComponent } from './team/team.component';
 import { AdminServicesComponent } from './services/admin-services.component';
 import { AdminProductsComponent } from './products/admin-products.component';
+import { BookingRulesComponent } from './booking-rules/booking-rules.component';
+import { EarningsComponent } from './earnings/earnings.component';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -19,11 +21,13 @@ export const ADMIN_ROUTES: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'settings', component: SettingsComponent },
       { path: 'agenda', component: AgendaComponent },
+      { path: 'comissao-ganhos', component: EarningsComponent },
       { path: 'clientes', component: ClientsComponent },
       { path: 'equipe', component: TeamComponent },
       { path: 'financeiro', component: FinancialComponent },
       { path: 'servicos', component: AdminServicesComponent },
       { path: 'produtos', component: AdminProductsComponent },
+      { path: 'regras-agenda', component: BookingRulesComponent },
       { path: 'servicos-historico', component: ServicesHistoryComponent }
     ]
   }

@@ -35,4 +35,8 @@ export class ProductsService {
       products.map(p => (p.id === updatedProduct.id ? updatedProduct : p))
     );
   }
+
+  deleteProduct(productId: number) {
+    this.products.update(products => products.filter(p => p.id !== productId));
+  }
 }

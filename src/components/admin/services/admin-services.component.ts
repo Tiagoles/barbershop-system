@@ -52,8 +52,9 @@ interface Service {
                     <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div>
                   </label>
                 </td>
-                <td class="px-6 py-4 text-right">
+                <td class="px-6 py-4 text-right space-x-4">
                   <button (click)="openEditModal(service)" class="font-medium text-yellow-500 hover:text-yellow-400">Editar</button>
+                  <button (click)="openDeleteModal(service)" class="font-medium text-red-500 hover:text-red-400">Excluir</button>
                 </td>
               </tr>
             } @empty {
@@ -140,6 +141,35 @@ interface Service {
         </div>
       </div>
     }
+
+    <!-- Delete Confirmation Modal -->
+    @if(isDeleteModalOpen() && serviceToDelete(); as service) {
+      <div class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" (click)="closeDeleteModal()">
+        <div class="bg-zinc-950 w-full max-w-md rounded-2xl border border-zinc-800 shadow-2xl p-6" (click)="$event.stopPropagation()">
+          <div class="text-center">
+            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-900/50 border border-red-500/30">
+              <svg class="h-6 w-6 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+              </svg>
+            </div>
+            <h3 class="mt-4 text-xl font-bold text-white">Excluir Serviço</h3>
+            <div class="mt-2">
+              <p class="text-sm text-zinc-400">
+                Tem certeza que deseja excluir <span class="font-bold text-white">{{ service.name }}</span>? Esta ação não pode ser desfeita.
+              </p>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-center gap-4">
+            <button type="button" (click)="closeDeleteModal()" class="w-full text-sm font-medium text-zinc-400 hover:text-white transition-colors px-4 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700">
+              Cancelar
+            </button>
+            <button type="button" (click)="confirmDelete()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-5 rounded-lg transition-colors shadow-md">
+              Excluir
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   `
 })
 export class AdminServicesComponent implements OnInit {
@@ -147,6 +177,9 @@ export class AdminServicesComponent implements OnInit {
   isModalOpen = signal(false);
   selectedService = signal<Service | null>(null);
   serviceForm!: FormGroup;
+
+  isDeleteModalOpen = signal(false);
+  serviceToDelete = signal<Service | null>(null);
 
   constructor(private fb: FormBuilder) {}
 
@@ -221,5 +254,23 @@ export class AdminServicesComponent implements OnInit {
       this.services.update(services => [...services, { ...formData, id: newId }]);
     }
     this.closeModal();
+  }
+
+  openDeleteModal(service: Service) {
+    this.serviceToDelete.set(service);
+    this.isDeleteModalOpen.set(true);
+  }
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen.set(false);
+    this.serviceToDelete.set(null);
+  }
+
+  confirmDelete() {
+    const service = this.serviceToDelete();
+    if (service) {
+      this.services.update(services => services.filter(s => s.id !== service.id));
+      this.closeDeleteModal();
+    }
   }
 }
