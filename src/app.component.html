@@ -1,0 +1,23 @@
+@if (isAuthenticated()) {
+<!-- Authenticated Layout -->
+@if (isAdminRoute()) {
+<!-- Admin area will be rendered here. The layout is part of the admin component -->
+<router-outlet></router-outlet>
+} @else {
+<!-- Public area -->
+<div class="min-h-screen flex flex-col">
+  <app-header></app-header>
+  <main class="flex-grow">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+}
+} @else {
+<!-- Public/Login Layout - permite /auth-success mesmo sem autenticação -->
+@if (isAuthSuccessRoute()) {
+<router-outlet></router-outlet>
+} @else {
+<app-login></app-login>
+}
+}
+<app-toast></app-toast>
