@@ -71,11 +71,43 @@ export class LoginComponent implements OnInit {
       const { email, password } = this.loginForm.value;
       this.authService.login(email, password).subscribe({
         error: (err) => {
+          this.handleAuthError(err);
           this.errorMessage.set(err.error?.message || 'Erro ao fazer login. Verifique suas credenciais.');
         }
       });
     }
   }
+
+  private handleAuthError(err: any) {
+    const code = err?.code;
+    let message = 'Erro inesperado ao autenticar.';
+
+    switch (code) {
+      case 'invalid_credentials':
+        message = 'E-mail ou senha inválidos.';
+        break;
+
+      case 'email_not_confirmed':
+        message = 'Seu e-mail ainda não foi confirmado.';
+        break;
+
+      case 'user_not_found':
+        message = 'Usuário não encontrado.';
+        break;
+
+      case 'too_many_requests':
+        message = 'Muitas tentativas. Tente novamente mais tarde.';
+        break;
+
+      default:
+        message = err?.message || message;
+        break;
+    }
+
+    this.toast.error(message || 'Erro ao fazer login');
+    this.errorMessage.set(message);
+  }
+
 
 
   onRegister() {

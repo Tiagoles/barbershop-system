@@ -98,8 +98,8 @@ import { ProductsService, Product } from '../../../services/products.service';
                   <input type="number" formControlName="price" class="w-full bg-zinc-800 border-zinc-700 rounded-md p-2.5 text-white focus:ring-yellow-500 focus:border-yellow-500">
                 </div>
                  <div>
-                  <label class="block text-sm font-medium text-zinc-300 mb-2">Preço com Desconto (Opcional)</label>
-                  <input type="number" formControlName="discountPrice" placeholder="Deixe 0 se não houver" class="w-full bg-zinc-800 border-zinc-700 rounded-md p-2.5 text-white focus:ring-yellow-500 focus:border-yellow-500">
+                  <label class="block text-sm font-medium text-zinc-300 mb-2">Desconto(%)</label>
+                  <input type="number" formControlName="discountPrice" class="w-full bg-zinc-800 border-zinc-700 rounded-md p-2.5 text-white focus:ring-yellow-500 focus:border-yellow-500">
                 </div>
               </div>
 
@@ -164,6 +164,7 @@ export class AdminProductsComponent implements OnInit {
   mediaPreviews = signal<string[]>([]);
 
   ngOnInit() {
+    // Inicializa o formulário
     this.productForm = this.fb.group({
       id: [null],
       name: ['', Validators.required],
@@ -171,11 +172,14 @@ export class AdminProductsComponent implements OnInit {
       discountPrice: [null],
       stock: [0, [Validators.required, Validators.min(0)]],
       description: [''],
-      media: this.fb.array([], Validators.required),
+      media: this.fb.array([],),
       isPremium: [false]
     });
+
+    // ✅ Chama o carregamento de produtos ao iniciar
+    this.productsService.loadProducts();
   }
-  
+
   get mediaFormArray() {
     return this.productForm.get('media') as FormArray;
   }
@@ -200,43 +204,48 @@ export class AdminProductsComponent implements OnInit {
   closeModal() {
     this.isModalOpen.set(false);
   }
-
+  selectedFiles: File[] = []; // Adicione esta propriedade
   onFileSelected(event: Event) {
     const files = (event.target as HTMLInputElement).files;
     if (!files) return;
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+    const fileList = Array.from(files);
+
+    fileList.forEach(file => {
+      this.selectedFiles.push(file); // Guarda o arquivo real para o upload
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
+        // Atualiza apenas a pré-visualização visual
         this.mediaPreviews.update(v => [...v, result]);
-        this.mediaFormArray.push(this.fb.control(result));
       };
       reader.readAsDataURL(file);
-    }
+    });
   }
 
   removeMedia(index: number) {
     this.mediaPreviews.update(v => v.filter((_, i) => i !== index));
     this.mediaFormArray.removeAt(index);
   }
-  
+
   saveProduct() {
     if (this.productForm.invalid) return;
 
     const formData = this.productForm.value;
-     // Handle empty discount price
+    // Handle empty discount price
     if (formData.discountPrice <= 0) {
       formData.discountPrice = null;
     }
 
     if (this.selectedProduct()) {
-      this.productsService.updateProduct(formData);
+      // this.productsService.updateProduct(formData);
     } else {
       const { id, ...newProduct } = formData;
-      this.productsService.addProduct(newProduct);
+
+      this.productsService.saveProduct(newProduct);
     }
     this.closeModal();
+    this.productsService.loadProducts();
   }
 }

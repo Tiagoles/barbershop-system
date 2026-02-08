@@ -65,6 +65,9 @@ import { SettingsService } from '../../services/settings.service';
             <button routerLink="/booking" class="hidden sm:inline-block bg-gold-500 hover:bg-gold-600 text-white dark:text-gray-900 font-bold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 text-sm">
               Agendar Agora
             </button>
+                        <button (click)="authService.logout()" class="text-sm text-red-500 hover:text-red-400 font-medium transition-colors">
+              Sair
+            </button>
             
             <!-- Mobile menu button -->
             <button (click)="isMobileMenuOpen.set(!isMobileMenuOpen())" type="button" class="md:hidden p-2 text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-controls="mobile-menu" aria-expanded="false">

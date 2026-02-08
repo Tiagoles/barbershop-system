@@ -244,7 +244,6 @@ export class AuthService {
 
   getFormattedUserName(): string {
     const user = this.currentUser();
-    console.log("formatado::::", user)
     if (!user) return '';
     return user.name
       .split(' ')
